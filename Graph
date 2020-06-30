@@ -1,0 +1,59 @@
+%matplotlib inline
+%reload_ext autoreload
+%autoreload 2
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+from matplotlib.lines import Line2D
+params = {'legend.fontsize': 'x-large',
+         'axes.labelsize': 'x-large',
+         'axes.titlesize':'x-large',
+         'xtick.labelsize':'x-large',
+         'ytick.labelsize':'x-large'}
+
+data = pd.read_csv('https://raw.githubusercontent.com/dguari1/Bulk_metrics/master/data/mirror_data/mirrored.csv')
+
+def plots_dots(lim, th, data):
+  rand_number = 1 + 0.05*np.random.randn(len(data),1)
+
+  lim = lim
+
+  fig, ax = plt.subplots(1,3, figsize=(15,10), num=1);
+  ax[0].set_xlim([0.5, 1.5])
+  ax[0].set_title('Yaw')
+  ax[0].set_ylim([-5,5])
+  ax[0].set_ylabel('angle')
+  ax[0].set_xticks([])
+  ax[1].set_xlim([0.5, 1.5])
+  ax[1].set_title('Pitch')
+  ax[1].set_ylim([-20,20])
+  ax[1].set_xticks([])
+  ax[2].set_xlim([0.5, 1.5])
+  ax[2].set_title('Roll')
+  ax[2].set_ylim([-5,5])
+  ax[2].set_xticks([])
+
+  for index, row in data.iterrows():
+      if row['smile']>th:
+        if abs(row['smile']-row['joy']) < lim:
+            ax[0].scatter(rand_number[index],row['yaw'], color='tab:blue',alpha=0.25, s=10)
+            ax[1].scatter(rand_number[index],row['pitch'], color='tab:blue',alpha=0.25, s=10)
+            ax[2].scatter(rand_number[index],row['roll'], color='tab:blue',alpha=0.25, s=10)    
+        elif (row['smile']-row['joy']) >= lim:
+            ax[0].scatter(rand_number[index],row['yaw'], color='tab:red',alpha=1, s=75)
+            ax[1].scatter(rand_number[index],row['pitch'], color='tab:red',alpha=1,s=75)
+            ax[2].scatter(rand_number[index],row['roll'], color='tab:red',alpha=1,s=75)
+        elif (row['joy']-row['smile']) >= lim:
+            ax[0].scatter(rand_number[index],row['yaw'], color='tab:orange',alpha=1, s=75)
+            ax[1].scatter(rand_number[index],row['pitch'], color='tab:orange',alpha=1,s=75)
+            ax[2].scatter(rand_number[index],row['roll'], color='tab:orange',alpha=1,s=75)
+            
+
+  custom_lines = [Line2D([0], [0], color='tab:blue', lw=6, alpha=0.1),
+                  Line2D([0], [0], color='tab:red', lw=6, alpha=1),
+                  Line2D([0], [0], color='tab:orange', lw=6, alpha=1)]
+
+  ax[2].legend(custom_lines, ['Smile | Joy', 'Smile |  No Joy',  ' No Smile |  Joy'],loc='lower right'),
+ 
